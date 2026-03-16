@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun-imgur
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=private internet access
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${PIA_USER}
+      - OPENVPN_PASSWORD=${PIA_PASSWORD}
+      - SERVER_REGIONS=${SERVER_REGIONS}
+      - FIREWALL=on
+      - FIREWALL_INPUT_PORTS=443,80
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+      - DOT=on
+      - DOT_PROVIDERS=cloudflare
+      - HEALTH_VPN_DURATION_INITIAL=30s
+    volumes:
+      - ./gluetun:/gluetun
+    restart: unless-stopped
+    networks:
+      imgur-macvlan:
+        ipv4_address: 192.168.1.200
+    healthcheck:
+      test: ["CMD", "/gluetun-entrypoint", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  imgur-proxy:
+    image: nginx:alpine
+    container_name: imgur-nginx
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: "service:gluetun"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+
+networks:
+  imgur-macvlan:
+    external: true
