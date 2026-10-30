@@ -29,15 +29,17 @@ Only the selected Imgur traffic uses the VPN; other requests from clients use th
 
 ### Supported hostnames
 
-| Domain | Purpose |
-|---|---|
-| `imgur.com` | Website |
-| `www.imgur.com` | Website alias |
-| `i.imgur.com` | Images |
-| `s.imgur.com` | JavaScript, CSS, assets |
-| `api.imgur.com` | Search, account, feeds and other API calls |
+| Hostname | Used for | Required for |
+| :--- | :--- | :--- |
+| **`imgur.com`** | Main website | Website |
+| **`www.imgur.com`** | Website alias | Website |
+| **`i.imgur.com`** | Hosted images | Images |
+| **`s.imgur.com`** | JavaScript, CSS, fonts and static assets | Page rendering |
+| **`api.imgur.com`** | Search, account features, feeds and API requests | Interactive features |
 
-Both the Nginx SNI allowlist and DNS rewrites must include **all five** names for the full site to function. This is *not* an unrestricted network proxy.
+
+> [!IMPORTANT]
+> **All five hostnames** must be in both the Nginx SNI allowlist **and** the AdGuard DNS rewrites for the full website to work. An HTTP `200` for the homepage does not prove that assets and API calls are working.
 
 ## Requirements
 
@@ -95,15 +97,18 @@ The proxy waits for Gluetun's VPN health check before starting.
 
 Under **Filters → DNS rewrites**, point each hostname to **your `PROXY_IP`**:
 
-| Domain | DNS answer |
-|---|---|
-| `imgur.com` | `YOUR_PROXY_IP` |
-| `www.imgur.com` | `YOUR_PROXY_IP` |
-| `i.imgur.com` | `YOUR_PROXY_IP` |
-| `s.imgur.com` | `YOUR_PROXY_IP` |
-| `api.imgur.com` | `YOUR_PROXY_IP` |
+| Domain | DNS Rewrite Target |
+| :--- | :--- |
+| `imgur.com` | **Your `PROXY_IP`** |
+| `www.imgur.com` | **Your `PROXY_IP`** |
+| `i.imgur.com` | **Your `PROXY_IP`** |
+| `s.imgur.com` | **Your `PROXY_IP`** |
+| `api.imgur.com` | **Your `PROXY_IP`** |
 
-Ensure devices actually use AdGuard rather than an alternative public DNS resolver or browser DNS-over-HTTPS. Verify IPv6 behaviour if relevant. **Never expose TCP 443 of the proxy to the public WAN.**
+
+> [!TIP]
+> Don't use a public secondary DNS server on clients that need these rewrites. Also check browser DNS-over-HTTPS, which may bypass AdGuard.
+> Ensure devices actually use AdGuard rather than an alternative public DNS resolver or browser DNS-over-HTTPS. Verify IPv6 behaviour if relevant. **Never expose TCP 443 of the proxy to the public WAN.**
 
 ### 5. Test from another LAN machine
 
@@ -147,15 +152,15 @@ docker compose build --pull proxy
 docker compose up -d
 ```
 
-| Symptom | Check |
-|---|---|
-| TLS handshake fails for a hostname | Check its AdGuard rewrite and `docker compose exec proxy nginx -T`; rebuild after changing `nginx.conf` |
-| Regional restriction in browser, but forced curl works | Client DNS, secondary resolver, browser DoH, local DNS caches, hosts file, proxy settings |
-| Website blank | `s.imgur.com` must use the proxy |
-| Search / login / feeds not working | `api.imgur.com` must use the proxy; check browser Network → XHR |
-| 403 or 429 through proxy | Imgur may block/rate-limit your VPN exit |
-| Docker host cannot reach proxy IP | Expected macvlan host-isolation limitation |
-| Startup DNS warning | Check whether Gluetun recovers and stays healthy |
+| Symptom | What to check |
+| :--- | :--- |
+| **TLS handshake fails** | Check the hostname in the Nginx SNI allowlist, then **rebuild** the proxy image after updating `nginx.conf`. |
+| **Regional restriction page** | Check client DNS servers, browser DoH, cached results and the actual connection destination. |
+| **Blank Imgur page** | Confirm `s.imgur.com` reaches SWImgur and returns JS/CSS assets. |
+| **Search, login or feeds fail** | Confirm `api.imgur.com` reaches SWImgur; inspect the browser Network tab for API `403` responses. |
+| **HTTP 403 / 429 through VPN** | Imgur may be restricting or rate-limiting the chosen VPN exit IP. |
+| **Docker host cannot reach proxy IP** | Normal macvlan host isolation; test from another LAN device. |
+| **Startup DNS warnings** | Verify Gluetun recovers and its health status remains `healthy`. |
 
 Avoid proxying random ad/tracker domains just because the browser lists blocked requests.
 
