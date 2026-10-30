@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 390" width="1200" height="390" role="img" aria-labelledby="title desc">
+<title id="title">SWImgur network architecture</title>
+<desc id="desc">Client requests are resolved by AdGuard Home to SWImgur's LAN address. Nginx uses SNI TLS passthrough and routes permitted Imgur hosts through Gluetun and a PIA VPN to Imgur servers. Other web traffic remains on the normal connection.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101b30"/><stop offset="1" stop-color="#182c47"/></linearGradient>
+  <linearGradient id="vpn" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#17546a"/><stop offset="1" stop-color="#203d64"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#050d1b" flood-opacity=".3"/></filter>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#79a9de"/></marker>
+  <marker id="arrowMuted" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#7e91af"/></marker>
+</defs>
+<rect width="1200" height="390" rx="22" fill="url(#bg)"/>
+<circle cx="1105" cy="44" r="190" fill="#3b6b9b" opacity=".07"/><circle cx="90" cy="340" r="175" fill="#64aee5" opacity=".045"/>
+<text x="46" y="52" fill="#f0f6ff" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">How SWImgur works</text>
+<text x="46" y="78" fill="#a2b5cf" font-family="Arial, Helvetica, sans-serif" font-size="13">Private HTTPS passthrough for selected Imgur hostnames — no VPN needed on individual devices</text>
+
+<!-- Five stages -->
+<g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" filter="url(#shadow)">
+ <rect x="40" y="128" width="198" height="146" rx="16" fill="#233750" stroke="#526c8d" stroke-width="1.2"/>
+ <rect x="273" y="128" width="198" height="146" rx="16" fill="#233750" stroke="#526c8d" stroke-width="1.2"/>
+ <rect x="506" y="128" width="198" height="146" rx="16" fill="#233750" stroke="#526c8d" stroke-width="1.2"/>
+ <rect x="739" y="128" width="198" height="146" rx="16" fill="url(#vpn)" stroke="#54a5bd" stroke-width="1.2"/>
+ <rect x="972" y="128" width="188" height="146" rx="16" fill="#204b47" stroke="#3a9d84" stroke-width="1.2"/>
+</g>
+<!-- connecting lines -->
+<g stroke="#79a9de" stroke-width="2.3" fill="none" marker-end="url(#arrow)">
+ <path d="M241 200 H267"/><path d="M474 200 H500"/><path d="M707 200 H733"/><path d="M940 200 H966"/>
+</g>
+<!-- icons -->
+<g fill="none" stroke="#a4d5ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+ <rect x="123" y="149" width="32" height="23" rx="3"/><path d="M139 172 v6 m-11 0 h22"/>
+ <path d="M366 151 l15 6 v11 c0 10-6 17-15 20-9-3-15-10-15-20v-11z"/><path d="M359 168 l5 5 10-11"/>
+ <path d="M591 154 l16 10 v14 l-16 10-16-10v-14z"/><path d="M575 164 l16 10 16-10 M591 174 v14"/>
+ <path d="M828 151 l15 6 v11 c0 10-6 17-15 20-9-3-15-10-15-20v-11z"/><path d="M823 168 l4 4 8-9"/>
+ <circle cx="1066" cy="168" r="17"/><path d="M1049 168 h34 M1066 151 c-10 9-10 25 0 34 M1066 151 c10 9 10 25 0 34"/>
+</g>
+<g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+ <g fill="#f7fbff" font-size="16" font-weight="700"><text x="139" y="213">Your device</text><text x="372" y="213">AdGuard Home</text><text x="605" y="213">Nginx proxy</text><text x="838" y="213">Gluetun + PIA</text><text x="1066" y="213">Imgur</text></g>
+ <g fill="#b6c7db" font-size="12"><text x="139" y="236">Browser or app</text><text x="372" y="236">DNS rewrite to LAN IP</text><text x="605" y="236">SNI / TLS passthrough</text><text x="838" y="236">VPN exit outside UK</text><text x="1066" y="236">Website, assets, API</text></g>
+</g>
+<!-- bottom information strip -->
+<path d="M48 308 H1152" stroke="#4a6687" stroke-opacity=".45"/>
+<circle cx="62" cy="339" r="7" fill="#53c8a0"/>
+<text x="82" y="344" font-family="Arial, Helvetica, sans-serif" fill="#d9e9f5" font-size="14" font-weight="600">Only selected Imgur hostnames use the VPN</text>
+<path d="M750 339 H814" stroke="#7e91af" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrowMuted)"/>
+<text x="832" y="344" font-family="Arial, Helvetica, sans-serif" fill="#a2b5cf" font-size="13">Other browsing stays on your normal connection</text>
+</svg>
