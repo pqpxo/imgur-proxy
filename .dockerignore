@@ -1,0 +1,10 @@
+# version 4.0.1
+.env
+.env.*
+!.env.example
+gluetun/
+.git/
+backups/
+*.backup
+*.log
+*.zip
