@@ -3,31 +3,38 @@
   <img src="imgur_github.png" alt="Imgur Proxy" />
 </p>
 
-# SWImgur — network-wide Imgur VPN proxy
+<h1 align="center">SWImgur — network-wide Imgur VPN proxy</h1><p align="center">
+  <br>
+  <strong>Access Imgur on your LAN using Private Internet Access (PIA), Gluetun, Nginx, Docker Compose and AdGuard Home — without installing a VPN on every device.</strong>
+</p>
 
-**Access Imgur on your LAN using Private Internet Access (PIA), Gluetun, Nginx, Docker Compose and AdGuard Home — without installing a VPN on every device.**
+<p align="center">
+  SWImgur uses AdGuard DNS rewrites to direct selected Imgur hostnames to an Nginx TCP proxy.<br>
+  Nginx routes TLS connections through a PIA VPN via Gluetun, without decrypting HTTPS or requiring local TLS certificates.
+</p>
 
-SWImgur uses AdGuard DNS rewrites to direct selected Imgur hostnames to an Nginx TCP proxy. Nginx routes TLS connections through a PIA VPN via Gluetun, without decrypting HTTPS or requiring local TLS certificates.
+<p align="center">
+  📝 Original write-up: <a href="https://makes.swakes.co.uk/imgur-said-403-forbidden/">Imgur said 403 Forbidden</a>.
+</p>
 
-> 📝 Original write-up: [Imgur said 403 Forbidden](https://makes.swakes.co.uk/imgur-said-403-forbidden/).
->
-> This is a community project, unaffiliated with Imgur, PIA, Gluetun or AdGuard. Imgur may restrict particular VPN exit servers, and site availability is not guaranteed.
+<p align="center">
+  <sub>This is a community project, unaffiliated with Imgur, PIA, Gluetun or AdGuard.<br>
+  Imgur may restrict particular VPN exit servers, and site availability is not guaranteed.</sub>
+</p>
+
+
 
 ## How it works
 
-```text
-Browser / app → AdGuard Home DNS rewrite → SWImgur macvlan IP:443
-                                             ↓
-                                   Nginx SNI passthrough
-                                             ↓
-                                      Gluetun + PIA
-                                             ↓
-                                  Public Imgur endpoints
-```
+<p align="center">
+  <img src="swimgur-flow.svg" alt="SWImgur network architecture" width="100%" />
+</p>
 
-Only the selected Imgur traffic uses the VPN; other requests from clients use their normal connection.
+Only selected Imgur hostnames are routed through PIA. All other browsing uses the client's normal internet connection.
 
-### Supported hostnames
+<br>
+
+## Supported hostnames
 
 | Hostname | Used for | Required for |
 | :--- | :--- | :--- |
@@ -37,9 +44,12 @@ Only the selected Imgur traffic uses the VPN; other requests from clients use th
 | **`s.imgur.com`** | JavaScript, CSS, fonts and static assets | Page rendering |
 | **`api.imgur.com`** | Search, account features, feeds and API requests | Interactive features |
 
-
+<br>
+ 
 > [!IMPORTANT]
 > **All five hostnames** must be in both the Nginx SNI allowlist **and** the AdGuard DNS rewrites for the full website to work. An HTTP `200` for the homepage does not prove that assets and API calls are working.
+
+<br>
 
 ## Requirements
 
@@ -49,6 +59,8 @@ Only the selected Imgur traffic uses the VPN; other requests from clients use th
 - AdGuard Home, Pi-hole or a similar DNS rewrite service used by LAN clients
 - A wired interface supporting Docker macvlan, an unused LAN IP address, and the LAN subnet/gateway
 - No conflicting device using the chosen address
+
+<br>
 
 ## Installation
 
@@ -105,10 +117,13 @@ Under **Filters → DNS rewrites**, point each hostname to **your `PROXY_IP`**:
 | `s.imgur.com` | **Your `PROXY_IP`** |
 | `api.imgur.com` | **Your `PROXY_IP`** |
 
+<br>
 
 > [!TIP]
 > Don't use a public secondary DNS server on clients that need these rewrites. Also check browser DNS-over-HTTPS, which may bypass AdGuard.
 > Ensure devices actually use AdGuard rather than an alternative public DNS resolver or browser DNS-over-HTTPS. Verify IPv6 behaviour if relevant. **Never expose TCP 443 of the proxy to the public WAN.**
+
+<br>
 
 ### 5. Test from another LAN machine
 
@@ -131,6 +146,8 @@ docker compose exec proxy wget -qO- https://api.ipify.org
 ```
 
 Do not post your real WAN IP publicly. A diagnostic helper is available in `scripts/check.sh`; the macvlan reachability portion should be run from a separate LAN machine.
+
+<br>
 
 ## Updating and troubleshooting
 
@@ -164,6 +181,8 @@ docker compose up -d
 
 Avoid proxying random ad/tracker domains just because the browser lists blocked requests.
 
+<br>
+
 ## Security and privacy
 
 - Nginx forwards **TLS over TCP** by reading SNI and does not terminate/decrypt HTTPS.
@@ -171,6 +190,8 @@ Avoid proxying random ad/tracker domains just because the browser lists blocked 
 - VPN egress uses Gluetun's network namespace and firewall; keep the proxy accessible only to trusted LAN clients.
 - `.env`, Gluetun state and backups are ignored by Git and excluded from Docker build context.
 - **Security notice for existing forks:** Older versions of this repository committed a `.env` file. Even after deleting it from the latest branch, those values may remain in Git history. Rotate any credentials that were present; consider purging sensitive history separately.
+
+<br>
 
 ## Files
 
